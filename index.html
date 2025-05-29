@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ant's Axis Scorekeeper</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 1rem;
+      background-color: #f7fff7;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    select {
+      width: 100%;
+      padding: 0.3rem;
+    }
+    #total, #rank {
+      font-weight: bold;
+      text-align: center;
+      font-size: 1.2rem;
+    }
+    .score-output {
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ant's Axis Scorekeeper</h1>
+  <table id="scoreTable">
+    <thead>
+      <tr>
+        <th>Throw</th>
+        <th>1st Double</th>
+        <th>Bull</th>
+        <th>2nd Double</th>
+        <th>Round Points</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="score-output">
+    <div id="total">Total Score: 0</div>
+    <div id="rank">Rank: -</div>
+  </div>
+
+  <script>
+    const sequence = [
+      [1, 19], [2, 12], [3, 20], [4, 16], [5, 17],
+      [6, 11], [7, 18], [8, 13], [9, 15], [10, 14],
+      [11, 6], [12, 2], [13, 8], [14, 10], [15, 9],
+      [16, 4], [17, 5], [18, 7], [19, 1], [20, 3]
+    ];
+
+    const tableBody = document.getElementById("tableBody");
+
+    sequence.forEach(([d1, d2], i) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>Throw ${i + 1}</td>
+        <td>
+          <select class="double1">
+            <option value="0">Miss</option>
+            <option value="1">Single</option>
+            <option value="2">Double</option>
+          </select>
+        </td>
+        <td>
+          <select class="bull">
+            <option value="1">Miss / x1</option>
+            <option value="2">Single Bull (x2)</option>
+            <option value="3">Double Bull (x3)</option>
+          </select>
+        </td>
+        <td>
+          <select class="double2">
+            <option value="0">Miss</option>
+            <option value="1">Single</option>
+            <option value="2">Double</option>
+          </select>
+        </td>
+        <td class="roundTotal">0</td>
+      `;
+      tableBody.appendChild(row);
+    });
+
+    document.querySelectorAll("select").forEach(select => {
+      select.addEventListener("change", calculateScores);
+    });
+
+    function calculateScores() {
+      let total = 0;
+      document.querySelectorAll("#scoreTable tbody tr").forEach(row => {
+        const d1 = parseInt(row.querySelector(".double1").value);
+        const bull = parseInt(row.querySelector(".bull").value);
+        const d2 = parseInt(row.querySelector(".double2").value);
+
+        const base = d1 + d2;
+        const roundScore = base * bull;
+        row.querySelector(".roundTotal").textContent = roundScore;
+        total += roundScore;
+      });
+      document.getElementById("total").textContent = `Total Score: ${total}`;
+      document.getElementById("rank").textContent = `Rank: ${getRank(total)}`;
+    }
+
+    function getRank(score) {
+      if (score < 50) return "GO PRACTICE";
+      if (score < 100) return "ROOM FOR GROWTH";
+      if (score < 140) return "SHARP SHOOTER";
+      return "TRUE DART PRO";
+    }
+  </script>
+</body>
+</html>
